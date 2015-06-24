@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin 
+    xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    id="cordova-plugin-videolauncher" 
+    version="1.0.0">
+
+    <name>Video Launcher</name>
+
+    <description>Cordova video launcher Plugin</description>
+
+    <license>Apache 2.0</license>
+    
+    <keywords>cordova,video, launcher</keywords>
+    
+    <js-module src="www/launcher.js" name="VideoLauncher">
+      <clobbers target="window.plugins.videoLauncher" />
+    </js-module>
+    
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="CDVVideoLauncher">
+                <param name="ios-package" value="CDVVideoLauncher"/>
+            </feature>
+        </config-file>
+        
+        <header-file src="src/ios/CDVVideoLauncher.h" />
+        <source-file src="src/ios/CDVVideoLauncher.m" />
+
+        <header-file src="src/ios/Multi-Party-Call/Classes/CDVVideoLauncherViewController.h" />
+        <source-file src="src/ios/Multi-Party-Call/Classes/CDVVideoLauncherViewController.m" compiler-flags="-fno-objc-arc"/>
+
+        <resource-file src="src/ios/Multi-Party-Call/Classes/CDVVideoLauncherViewController.xib" />
+
+        <resource-file src="src/ios/Multi-Party-Call/Classes/ShaderUtilities.c" />
+        <resource-file src="src/ios/Multi-Party-Call/Classes/ShaderUtilities.h" />
+
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/archiving-off-15@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/archiving_on-5.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/archiving_on-5@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/archiving_pulse-15.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/Bandwidth_meter_strong-23.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/Bandwidth_meter_strong-23@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/Bandwidth_meter_weak-23.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/Bandwidth_meter_weak-23@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/camera-switch_black-33.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/camera-switch_black-33@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/camera_switch-33.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/camera_switch-33@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/icon_arrowLeft_disabled-28.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/icon_arrowLeft_disabled-28@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/icon_arrowLeft_enabled-28.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/icon_arrowLeft_enabled-28@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/icon_arrowRight_disabled-28.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/icon_arrowRight_disabled-28@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/icon_arrowRight_enabled-28.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/icon_arrowRight_enabled-28@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/mic-24.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/mic-24@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/mic_muted-24.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/mic_muted-24@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/mic_receiving_data-35.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/mic_receiving_data-35@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/Subscriber-Speaker-35.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/Subscriber-Speaker-35@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/Subscriber-Speaker-Mute-35.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/Subscriber-Speaker-Mute-35@2x.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/TB Bug-30.png" />
+        <resource-file src="src/ios/Multi-Party-Call/ImageResources/TB Bug-30@2x.png" />
+
+    </platform>
+</plugin>
