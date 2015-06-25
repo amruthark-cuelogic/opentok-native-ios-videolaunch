@@ -22,14 +22,14 @@ function VideoLauncher() {
 
 VideoLauncher.prototype.launch = function(successCallback, errorCallback, options) {
 
-//  argscheck.checkArgs('ssFF*', 'VideoLauncher.launch', arguments);
-
   if(!options) {
     options = {};
+    console.log('emtpy options not allowed');
+    return;
   }
 
   var params = {
-    apikey : options.apiKey ? options.apiKey : "44983462",
+    apikey : options.apiKey,
     token: options.token,
     sessionID: options.sessionID
   };
@@ -47,6 +47,29 @@ VideoLauncher.prototype.launch = function(successCallback, errorCallback, option
   exec(successCallback, errorCallback, "CDVVideoLauncher" , "videoLaunch", [params]);
 
 }
+
+VideoLauncher.prototype.endBrowserVideoCall = function(successCallback, errorCallback, options) {
+
+  if(!options) {
+    options = {};
+    console.log("empty options not allowed");
+    return;
+  }
+
+  if (typeof errorCallback != "function") {
+    console.log("endBrowserVideoCall.find failure: errorCallback parameter must be a function");
+    return
+  }
+
+  if (typeof successCallback != "function") {
+    console.log("endBrowserVideoCall.find failure: successCallback parameter must be a function");
+    return
+  }
+
+  exec(successCallback, errorCallback, "CDVVideoLauncher" , "endBrowserVideoCall", [options]);
+
+}
+
 
 var videoLauncher = new VideoLauncher();
 module.exports = videoLauncher;

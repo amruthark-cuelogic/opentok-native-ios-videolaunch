@@ -609,14 +609,13 @@
     }
 }
 
--(void)handleEventOnEndCall
+-(void)endVideoCall
 {
     if (_session && _session.sessionConnectionStatus ==
         OTSessionConnectionStatusConnected) {
         // disconnect session
         NSLog(@"disconnecting....");
         [_session disconnect:nil];
-        return;
     }
     NSDictionary *eventData = [NSDictionary dictionaryWithObjectsAndKeys:
                                @"EndVideoCall", @"eventType",
@@ -718,7 +717,7 @@
     }
     [self resetArrowsStates];
     
-    [self handleEventOnEndCall];
+    [self endVideoCall];
 
 }
 
@@ -740,10 +739,10 @@
     _currentSubscriber = nil;
     [self reArrangeSubscribers];
     
-    if([allSubscribers count] < 1){
-        [self handleEventOnEndCall];
-        return;
-    }
+//    if([allSubscribers count] < 1){
+//        [self handleEventOnEndCall];
+//        return;
+//    }
     
     // show first subscriber
     if ([allConnectionsIds count] > 0) {
@@ -753,6 +752,8 @@
     }
     
     [self resetArrowsStates];
+    
+    [self showActivityView];
 }
 
 - (void)createSubscriber:(OTStream *)stream
@@ -833,7 +834,7 @@
     streamCreated:(OTStream *)stream
 {
     // create self subscriber
-    [self createSubscriber:stream];
+    //[self createSubscriber:stream];
 }
 
 - (void)  session:(OTSession *)mySession
