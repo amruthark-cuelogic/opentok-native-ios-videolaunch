@@ -17,15 +17,15 @@ cordova plugin add https://github.com/amruthark-cuelogic/opentok-native-ios-vide
 &lt;/<span class="pl-ent">feature</span>&gt;</pre></div>
 
 2. Grab a copy of launcher.js, add it to your project and reference it in index.html:
-    <pre><script type="text/javascript" src="js/launcher.js"></script></pre>
+    <pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>js/launcher.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre>
 
 3. Download the source files for iOS and copy them to your project.
 
  iOS:
   <ul>
-  <li>Copy CDVVideolauncher.* to platforms/ios/<ProjectName>/Plugins.</li>
-  <li>Copy the files from Multi-party-call/Classes folder to platforms/ios/<ProjectName>/Plugins</li>
-  <li>Copy the image files from Multi-party-call/ImageResources to platforms/ios/<ProjectName>/Resources</li>
+    <li>Copy CDVVideolauncher.* to platforms/ios/<ProjectName>/Plugins.</li>
+    <li>Copy the files from Multi-party-call/Classes folder to platforms/ios/<ProjectName>/Plugins</li>
+    <li>Copy the image files from Multi-party-call/ImageResources to platforms/ios/<ProjectName>/Resources</li>
   </ul>
 
 # Usage
