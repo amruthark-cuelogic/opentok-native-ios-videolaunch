@@ -6,23 +6,27 @@ This plugin allows to connect to iOS native camera using opentok.
 
 cordova plugin add https://github.com/amruthark-cuelogic/opentok-native-ios-videolaunch
 
+# Manual installation
+
 1. Add the following xml to your config.xml:
 
-<!-- for iOS -->
-  <feature name="VideoLauncher">
-      <param name="ios-package" value="CDVVideoLauncher" />
-  </feature>
+<div class="highlight highlight-xml">
+  <pre><span class="pl-c">&lt;!-- for iOS --&gt;</span>
+  <span class="pl-ent">feature</span><span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>VideoLauncher<span class="pl-pds">"</span></span>&gt;
+    &lt;<span class="pl-ent">param</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>ios-package<span class="pl-pds">"</span></span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>CDVVideoLauncher<span class="pl-pds">"</span></span> /&gt;
+&lt;/<span class="pl-ent">feature</span>&gt;</pre></div>
 
 2. Grab a copy of launcher.js, add it to your project and reference it in index.html:
+    <pre><script type="text/javascript" src="js/launcher.js"></script></pre>
 
-<script type="text/javascript" src="js/launcher.js"></script>
 3. Download the source files for iOS and copy them to your project.
 
-iOS:
-
-Copy CDVVideolauncher.* to platforms/ios/<ProjectName>/Plugins.
-Copy the files from Multi-party-call/Classes folder to platforms/ios/<ProjectName>/Plugins
-Copy the image files from Multi-party-call/ImageResources to platforms/ios/<ProjectName>/Resources
+ iOS:
+  <ul>
+  <li>Copy CDVVideolauncher.* to platforms/ios/<ProjectName>/Plugins.</li>
+  <li>Copy the files from Multi-party-call/Classes folder to platforms/ios/<ProjectName>/Plugins</li>
+  <li>Copy the image files from Multi-party-call/ImageResources to platforms/ios/<ProjectName>/Resources</li>
+  </ul>
 
 # Usage
 
