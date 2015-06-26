@@ -48,25 +48,23 @@
     
     BOOL initialized;
     int _currentSubscriberIndex;
-    
+
 }
 
 @end
 
 @implementation CDVVideoLauncherViewController
 {
-    NSString* _apiKey;
-    NSString* _sessionId;
-    NSString* _token;
+
 }
 
-@synthesize videoContainerView,videoLauncher;
+@synthesize videoContainerView,videoLauncher,strApiKey,strSessionId,strToken;
 
 - (void)initSessionWithApiKey:(NSString *) apiKey withSessionId:(NSString *) sessionId withTokenId:(NSString *) tokenId
 {
-    _apiKey = apiKey;
-    _sessionId = sessionId;
-    _token = tokenId;
+    self.strApiKey= apiKey;
+    self.strSessionId = sessionId;
+    self.strToken = tokenId;
 }
 
 -(void) viewDidAppear:(BOOL)animated
@@ -469,18 +467,25 @@
 
 - (void)setupSession
 {
+    NSLog(@"setupSession");
     //setup one time session
     if (_session) {
         [_session release];
         _session = nil;
     }
     
-    _session = [[OTSession alloc] initWithApiKey:_apiKey
-                                       sessionId:_sessionId
+    _session = [[OTSession alloc] initWithApiKey:self.strApiKey
+                                       sessionId:self.strSessionId
                                         delegate:self];
-    [_session connectWithToken:_token error:nil];
+    [_session connectWithToken:self.strToken error:nil];
 //    [self setupPublisher];
     
+}
+
+-(void) reconnectSession
+{
+    NSLog(@"reconnectSession");
+    [_session connectWithToken:self.strToken error:nil];
 }
 
 - (void)setupPublisher
@@ -693,6 +698,7 @@
 - (void)sessionDidDisconnect:(OTSession *)session
 {
     NSLog(@"sessionDidDisconnect");
+    
     // remove all subscriber views from video container
     for (int i = 0; i < [allConnectionsIds count]; i++)
     {
@@ -869,7 +875,7 @@
 #pragma mark - Helper Methods
 - (IBAction)endCallAction:(UIButton *)button
 {
-    if (_session && _session.sessionConnectionStatus ==
+     if (_session && _session.sessionConnectionStatus ==
         OTSessionConnectionStatusConnected) {
         // disconnect session
         NSLog(@"disconnecting....");
@@ -884,13 +890,26 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertView *alert = [[[UIAlertView alloc]
                                initWithTitle:@"Message from video session"
-                               message:string
+                               message:@"There was an error connecting to session."
                                delegate:self
-                               cancelButtonTitle:@"OK"
-                               otherButtonTitles:nil] autorelease];
+                               cancelButtonTitle:@"End Call"
+                               otherButtonTitles:@"Try Again",nil] autorelease];
         [alert show];
     });
+    
 }
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    if([title isEqualToString:@"Try Again"]){
+        [self reconnectSession];
+    }else if([title isEqualToString:@"End Call"]){
+        [self endVideoCall];
+    }
+    
+}
+
 
 - (void)didReceiveMemoryWarning
 {
@@ -941,11 +960,15 @@
     [_leftArrowImgView release];
     [_archiveStatusImgView2 release];
     [videoLauncher release];
+    [self.strApiKey release];
+    [self.strSessionId release];
+    [self.strToken release];
 //  [super dealloc];
 }
 
 - (IBAction)toggleCameraPosition:(id)sender
 {
+
     if (_publisher.cameraPosition == AVCaptureDevicePositionBack) {
         _publisher.cameraPosition = AVCaptureDevicePositionFront;
         self.cameraToggleButton.selected = NO;

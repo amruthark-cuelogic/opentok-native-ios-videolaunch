@@ -7,6 +7,9 @@
 @interface CDVVideoLauncherViewController : UIViewController <OTSessionDelegate, OTPublisherDelegate, UITextFieldDelegate, UIGestureRecognizerDelegate, UIScrollViewDelegate> {
     
 }
+@property (retain, nonatomic) NSString *strApiKey;
+@property (retain, nonatomic) NSString *strSessionId;
+@property (retain, nonatomic) NSString *strToken;
 @property (strong, nonatomic) IBOutlet UIScrollView *videoContainerView;
 @property (strong, nonatomic) IBOutlet UIView *bottomOverlayView;
 @property (strong, nonatomic) IBOutlet UIView *topOverlayView;
