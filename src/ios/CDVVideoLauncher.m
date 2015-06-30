@@ -4,7 +4,8 @@
 
 @implementation CDVVideoLauncher
 {
-    NSString *listenerCallbackId;
+    NSString *listenerCallbackIdVideoEndCall;
+    NSString *listenerCallbackIdBrowserEndCall;
     CDVVideoLauncherViewController *viewController;
     
 }
@@ -17,7 +18,7 @@
     NSString *apiKey = [argDict objectForKey:@"apikey"];
     NSString *tokenId = [argDict objectForKey:@"token"];
     NSString *sessionId = [argDict objectForKey:@"sessionID"];
-    listenerCallbackId = command.callbackId;
+    listenerCallbackIdVideoEndCall = command.callbackId;
     
     viewController = [[CDVVideoLauncherViewController alloc]initWithNibName:@"CDVVideoLauncherViewController" bundle:nil];
     [viewController initSessionWithApiKey:apiKey withSessionId:sessionId withTokenId:tokenId];
@@ -26,24 +27,41 @@
     [rootVC presentViewController:viewController animated:YES completion:nil];
 }
 
-- (void)endBrowserVideoCall:(CDVInvokedUrlCommand*)command
+- (void)refreshBrowserVideoCall:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"endBrowserVideoCall");
-    [viewController endVideoCall];
+    NSLog(@"refreshBrowserVideoCall");
+    [viewController refreshVideoCall];
     NSDictionary *eventData = [NSDictionary dictionaryWithObjectsAndKeys:
-                               @"EndVideoCall", @"eventType",
+                               @"RefreshVideoCall", @"eventType",
                                nil];
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:eventData];
     [pluginResult setKeepCallbackAsBool:true];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:listenerCallbackId];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void)reportEvent:(NSDictionary*)eventData
+- (void)endBrowserVideoCall:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"reportEvent");
+    NSLog(@"endBrowserVideoCall");
+    listenerCallbackIdBrowserEndCall = command.callbackId;
+    [viewController endBrowserVideoCall];
+}
+
+- (void)reportEventForBrowserEndCall:(NSDictionary*)eventData
+{
+    NSLog(@"reportEventForBrowserEndCall");
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:eventData];
     [pluginResult setKeepCallbackAsBool:true];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:listenerCallbackId];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:listenerCallbackIdBrowserEndCall];
+    viewController = nil;
+}
+
+- (void)reportEventForVideoEndCall:(NSDictionary*)eventData
+{
+    NSLog(@"reportEventForVideoEndCall");
+    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:eventData];
+    [pluginResult setKeepCallbackAsBool:true];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:listenerCallbackIdVideoEndCall];
+    viewController = nil;
 }
 
 @end

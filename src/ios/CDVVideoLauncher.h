@@ -5,6 +5,7 @@
 
 - (void)videoLaunch:(CDVInvokedUrlCommand*)command;
 - (void)endBrowserVideoCall:(CDVInvokedUrlCommand*)command;
-- (void)reportEvent:(NSDictionary*)eventData;
-
+- (void)refreshBrowserVideoCall:(CDVInvokedUrlCommand*)command;
+- (void)reportEventForBrowserEndCall:(NSDictionary*)eventData;
+- (void)reportEventForVideoEndCall:(NSDictionary*)eventData;
 @end

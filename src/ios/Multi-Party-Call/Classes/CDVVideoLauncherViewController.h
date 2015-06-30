@@ -36,6 +36,7 @@
 - (IBAction)endCallAction:(UIButton *)button;
 
 - (void)initSessionWithApiKey:(NSString *) apiKey withSessionId:(NSString *) sessionId withTokenId:(NSString *) tokenId;
-- (void)endVideoCall;
+- (void)endBrowserVideoCall;
+- (void)refreshVideoCall;
 
 @end

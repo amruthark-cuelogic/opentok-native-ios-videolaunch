@@ -62,6 +62,7 @@
 
 - (void)initSessionWithApiKey:(NSString *) apiKey withSessionId:(NSString *) sessionId withTokenId:(NSString *) tokenId
 {
+    NSLog(@"initSessionWithApiKey");
     self.strApiKey= apiKey;
     self.strSessionId = sessionId;
     self.strToken = tokenId;
@@ -614,20 +615,6 @@
     }
 }
 
--(void)endVideoCall
-{
-    if (_session && _session.sessionConnectionStatus ==
-        OTSessionConnectionStatusConnected) {
-        // disconnect session
-        NSLog(@"disconnecting....");
-        [_session disconnect:nil];
-    }
-    NSDictionary *eventData = [NSDictionary dictionaryWithObjectsAndKeys:
-                               @"EndVideoCall", @"eventType",
-                               nil];
-    [videoLauncher reportEvent:eventData];
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
 
 -(void) hideActivityView
 {
@@ -671,7 +658,7 @@
     
     CGFloat containerWidth = CGRectGetWidth(videoContainerView.bounds);
     CGFloat containerHeight = CGRectGetHeight(videoContainerView.bounds);
-    int count = [allConnectionsIds count];
+    int count = (int)[allConnectionsIds count];
     
     // arrange all subscribers horizontally one by one.
     for (int i = 0; i < [allConnectionsIds count]; i++)
@@ -704,18 +691,31 @@
     {
         OTSubscriber *subscriber = [allSubscribers valueForKey:
                                            [allConnectionsIds objectAtIndex:i]];
+        subscriber.subscribeToAudio = NO;
+        [session unsubscribe:subscriber error:nil];
         [subscriber.view removeFromSuperview];
-    }
+        [subscriber release];
+        subscriber = nil;
+     }
     
+    _currentSubscriber.subscribeToAudio = NO;
+    [session unsubscribe:_currentSubscriber error:nil];
+    [session unpublish:_publisher error:nil];
     [_publisher.view removeFromSuperview];
     
     [allSubscribers removeAllObjects];
     [allConnectionsIds removeAllObjects];
     [allStreams removeAllObjects];
     
-    _currentSubscriber = NULL;
-    [_publisher release];
-    _publisher = nil;
+    
+    _currentSubscriber = nil;
+
+    
+    if(_publisher != nil){
+        [_publisher release];
+        _publisher = nil;
+    }
+
     
     if (self.archiveStatusImgView2.isAnimating)
     {
@@ -723,7 +723,7 @@
     }
     [self resetArrowsStates];
     
-    [self endVideoCall];
+    [self dissmissVideoScreen];
 
 }
 
@@ -738,17 +738,15 @@
     
     // remove from superview
     [subscriber.view removeFromSuperview];
+    if(subscriber.stream.connection != nil){
+        [allSubscribers removeObjectForKey:stream.connection.connectionId];
+        [allConnectionsIds removeObject:stream.connection.connectionId];
+    }
     
-    [allSubscribers removeObjectForKey:stream.connection.connectionId];
-    [allConnectionsIds removeObject:stream.connection.connectionId];
-    
+
     _currentSubscriber = nil;
     [self reArrangeSubscribers];
     
-//    if([allSubscribers count] < 1){
-//        [self handleEventOnEndCall];
-//        return;
-//    }
     
     // show first subscriber
     if ([allConnectionsIds count] > 0) {
@@ -796,13 +794,16 @@
     
     // create subscriber
     OTSubscriber *sub = (OTSubscriber *)subscriber;
+    if(sub.stream.connection == nil){
+        return;
+    }
     [allSubscribers setObject:subscriber forKey:sub.stream.connection.connectionId];
     [allConnectionsIds addObject:sub.stream.connection.connectionId];
     
     // set subscriber position and size
     CGFloat containerWidth = CGRectGetWidth(videoContainerView.bounds);
     CGFloat containerHeight = CGRectGetHeight(videoContainerView.bounds);
-    int count = [allConnectionsIds count] - 1;
+    int count = (int)[allConnectionsIds count] - 1;
     [sub.view setFrame:
      CGRectMake(count *
                 CGRectGetWidth(videoContainerView.bounds),
@@ -880,12 +881,18 @@
         // disconnect session
         NSLog(@"disconnecting....");
         [_session disconnect:nil];
+         
+         NSDictionary *eventData = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    @"EndVideoCall", @"eventType",
+                                    nil];
+         [videoLauncher reportEventForVideoEndCall:eventData];
         return;
     }
 }
 
 - (void)showAlert:(NSString *)string
 {
+    return;
     // show alertview on main UI
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertView *alert = [[[UIAlertView alloc]
@@ -917,6 +924,49 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - Public Functions
+-(void)endVideoCall
+{
+    if (_session && _session.sessionConnectionStatus ==
+        OTSessionConnectionStatusConnected) {
+        // disconnect session
+        NSLog(@"disconnecting....");
+        [_session disconnect:nil];
+    }
+    NSDictionary *eventData = [NSDictionary dictionaryWithObjectsAndKeys:
+                               @"EndVideoCall", @"eventType",
+                               nil];
+    [videoLauncher reportEventForVideoEndCall:eventData];
+}
+
+-(void)endBrowserVideoCall
+{
+    NSLog(@"endBrowserVideoCallViewController");
+    NSDictionary *eventData = [NSDictionary dictionaryWithObjectsAndKeys:
+                               @"EndVideoCall", @"eventType",
+                               nil];
+    [videoLauncher reportEventForBrowserEndCall:eventData];
+    if (_session && _session.sessionConnectionStatus ==
+        OTSessionConnectionStatusConnected) {
+        // disconnect session
+        NSLog(@"disconnecting....");
+        [_session disconnect:nil];
+    }
+    
+}
+
+-(void) refreshVideoCall
+{
+    NSLog(@"refreshVideoCall");
+    [self reconnectSession];
+}
+
+-(void) dissmissVideoScreen
+{
+    NSLog(@"dissmissVideoScreen");
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 #pragma mark - Other Interactions
 - (IBAction)toggleAudioSubscribe:(id)sender
 {
@@ -929,42 +979,7 @@
     }
 }
 
-- (void)dealloc
-{
-    NSLog(@"Dealloc");
-    [[NSNotificationCenter defaultCenter]
-     removeObserver:self
-     name:UIApplicationWillResignActiveNotification
-     object:nil];
-    
-    [[NSNotificationCenter defaultCenter]
-     removeObserver:self
-     name:UIApplicationDidBecomeActiveNotification
-     object:nil];
 
-    [_cameraToggleButton release];
-    [_audioPubUnpubButton release];
-    [_userNameLabel release];
-    [_audioSubUnsubButton release];
-    [_overlayTimer release];
-    
-    [_endCallButton release];
-    [_cameraSeparator release];
-    [_micSeparator release];
-    [_archiveOverlay release];
-    [_archiveStatusLbl release];
-    [_archiveStatusImgView release];
-    [_leftArrowImgView release];
-    [_rightArrowImgView release];
-    [_rightArrowImgView release];
-    [_leftArrowImgView release];
-    [_archiveStatusImgView2 release];
-    [videoLauncher release];
-    [self.strApiKey release];
-    [self.strSessionId release];
-    [self.strToken release];
-//  [super dealloc];
-}
 
 - (IBAction)toggleCameraPosition:(id)sender
 {
@@ -1058,6 +1073,8 @@
     NSLog(@"enteringBackgroundMode");
     _publisher.publishVideo = NO;
     _currentSubscriber.subscribeToVideo = NO;
+    _publisher.publishAudio = NO;
+    _currentSubscriber.subscribeToAudio = NO;
 }
 
 - (void)leavingBackgroundMode:(NSNotification*)notification
@@ -1065,7 +1082,9 @@
     NSLog(@"leavingBackgroundMode");
     _publisher.publishVideo = YES;
     _currentSubscriber.subscribeToVideo = YES;
-    
+    _publisher.publishAudio = YES;
+    _currentSubscriber.subscribeToAudio = YES;
+
     //now subscribe to any background connected streams
     for (OTStream *stream in backgroundConnectedStreams)
     {
@@ -1097,6 +1116,66 @@ archiveStoppedWithId:(NSString *)archiveId
 {
     NSLog(@"session archiving stopped");
     [self stopArchiveAnimation];
+}
+
+- (void)dealloc
+{
+    NSLog(@"Dealloc");
+    [[NSNotificationCenter defaultCenter]
+     removeObserver:self
+     name:UIApplicationWillResignActiveNotification
+     object:nil];
+    
+    [[NSNotificationCenter defaultCenter]
+     removeObserver:self
+     name:UIApplicationDidBecomeActiveNotification
+     object:nil];
+    
+    [_cameraToggleButton release];
+    [_audioPubUnpubButton release];
+    [_userNameLabel release];
+    [_audioSubUnsubButton release];
+    [_overlayTimer release];
+    
+    [_endCallButton release];
+    [_cameraSeparator release];
+    [_micSeparator release];
+    [_archiveOverlay release];
+    [_archiveStatusLbl release];
+    [_archiveStatusImgView release];
+    [_leftArrowImgView release];
+    [_rightArrowImgView release];
+    [_rightArrowImgView release];
+    [_leftArrowImgView release];
+    [_archiveStatusImgView2 release];
+    [self.strApiKey release];
+    [self.strSessionId release];
+    [self.strToken release];
+    
+//    if(_session != nil){
+//        [_session release];
+//        _session = nil;
+//    }
+    
+    if(_publisher != nil){
+        _publisher.publishVideo = NO;
+        _publisher.publishAudio = NO;
+        [_publisher release];
+        _publisher = nil;
+    }
+    
+    if(_currentSubscriber != nil){
+        _currentSubscriber.subscribeToVideo = NO;
+        _currentSubscriber.subscribeToAudio = NO;
+        [_currentSubscriber release];
+        _currentSubscriber = nil;
+    }
+
+    if(videoLauncher != nil){
+        [videoLauncher release];
+        videoLauncher = nil;
+    }
+  
 }
 
 @end
